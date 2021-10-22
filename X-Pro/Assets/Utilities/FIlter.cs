@@ -71,11 +71,7 @@ public class ViewSetFilter : IFilter
 
             if (property != null)
             {
-                if(viewSet.View_X.Contains(property.dataSet.x_name))
-                    return true;
-
-                if (viewSet.View_Z.Contains(property.dataSet.groupName))
-                    return true;
+                return (viewSet.View_X.Contains(property.dataSet.x_name) && viewSet.View_Z.Contains(property.dataSet.groupName));
             } 
         }
 

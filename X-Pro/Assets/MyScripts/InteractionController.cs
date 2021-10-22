@@ -14,7 +14,7 @@ public class ViewSet
 public class InteractionController : MonoBehaviour
 {
     /// <summary>
-    /// Stores 
+    /// Stores inital data for each bar 
     /// </summary>
     struct BarDataSet
     {
@@ -30,7 +30,9 @@ public class InteractionController : MonoBehaviour
     private BarGraphGenerator generator;
     private GameObject focused;
     bool selected = false;
+    private bool init = false;
     private bool moving;
+    bool start = false;
     private Dictionary<GameObject, BarDataSet> barDatasets = new Dictionary<GameObject, BarDataSet>();
 
     #endregion
@@ -41,6 +43,14 @@ public class InteractionController : MonoBehaviour
     public GameObject viewer; 
 
     #endregion
+
+    /// <summary>
+    /// Checks if a specific <see cref="Vector3"/> point is within a certain range to another <see cref="Vector3"/> point
+    /// </summary>
+    /// <param name="point1"></param>
+    /// <param name="point2"></param>
+    /// <param name="distance">The maximum range between the two points</param>
+    /// <returns></returns>
 
     private bool Around(Vector3 point1, Vector3 point2, float distance)
     {
@@ -75,7 +85,7 @@ public class InteractionController : MonoBehaviour
 
     private void onBarPointerDown(GameObject bar)
     {
-
+        focusBar(bar);
     }
 
     private void onBarPointerUp(GameObject bar)
@@ -107,8 +117,16 @@ public class InteractionController : MonoBehaviour
         return root;
     }
 
+    /// <summary>
+    /// register all initial bars to the set
+    /// </summary>
     private void registerAll()
     {
+        if (!init)
+            init = true;
+        else
+            throw new Exception("Error bars are already registered");
+
         foreach(BarGroup group in generator.Graph.ListOfGroups)
         {
             foreach(GameObject bar in group.ListOfBar)
@@ -118,6 +136,10 @@ public class InteractionController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Register a specific bar to the set
+    /// </summary>
+    /// <param name="bar"></param>
     private void registerToSet(GameObject bar)
     {
         if(!barDatasets.ContainsKey(bar))
@@ -139,6 +161,10 @@ public class InteractionController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// restores a bar to it's default based on it's registration from the set
+    /// </summary>
+    /// <param name="bar"></param>
     private void restoreBarDefault(GameObject bar)
     {
         BarDataSet focusedSet = barDatasets[bar];                               // get the data set for the corresponding bar
@@ -148,6 +174,10 @@ public class InteractionController : MonoBehaviour
         focusedSet.property.SetLabelEnabel();                                       // reset the bar label
     }
 
+    /// <summary>
+    /// Sets a specific bar as focused and restores the default for every other bar
+    /// </summary>
+    /// <param name="bar"></param>
     private void setFocused(GameObject bar)
     {
         if (!barDatasets.ContainsKey(bar))
@@ -163,6 +193,10 @@ public class InteractionController : MonoBehaviour
         }   
     }
 
+    /// <summary>
+    /// Greys all bars except a given one
+    /// </summary>
+    /// <param name="bar"></param>
     private void grey_bars_without(GameObject bar)
     {
         foreach(BarGroup group in generator.Graph.ListOfGroups)
@@ -198,6 +232,14 @@ public class InteractionController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Realizing a motion effect which is flying the camera to a certain given object
+    /// </summary>
+    /// <param name="targetObject">The target object</param>
+    /// <param name="relCamVector">A relative vector in which the camerea should be at the end of the movement relative to the target object</param>
+    /// <param name="viewer">The camera object</param>
+    /// <param name="seconds">The time in which the movement should be finished</param>
+    /// <param name="lookObject">Sets where the camera should be looking while the movement and at the end</param>
     private void moveFocused(GameObject targetObject, Vector3 relCamVector, GameObject viewer, int seconds, GameObject lookObject = null)
     {
         IEnumerator stepMoveFocused(GameObject targetObject, Vector3 targetPosition, float period, float resolution, GameObject lookObject = null)
@@ -238,6 +280,10 @@ public class InteractionController : MonoBehaviour
         StartCoroutine(stepMoveFocused(rootObject, rootTargetPosition,period,resolution,lookObject));
     }
 
+    /// <summary>
+    /// Sets the text label for a highlighted bar
+    /// </summary>
+    /// <param name="bar"></param>
     private void setBarHighlightText(GameObject bar)
     {
         BarProperty property = bar.GetComponent<BarProperty>();
@@ -255,11 +301,21 @@ public class InteractionController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets a certain bar highlight
+    /// </summary>
+    /// <param name="bar"></param>
+
     private void setBarHighlighted(GameObject bar)
     {
         setBarHighlightText(bar);
     }
 
+    /// <summary>
+    /// Focus a specific bar
+    /// </summary>
+    /// <param name="bar"></param>
+    /// <returns></returns>
     private bool focusBar(GameObject bar)
     {
         if (moving) // Don't react if we are already moving
@@ -275,7 +331,7 @@ public class InteractionController : MonoBehaviour
                     setFocused(bar);
                 else // reset the focus
                 {
-                    resetFilter();
+                    setBarsDefault();
                     focused = null;
                     return false;
                 }
@@ -286,12 +342,12 @@ public class InteractionController : MonoBehaviour
                 //grey_bars_without(bar);
 
                 //moveFocused(bar, relCamVec, viewer, 5,bar);
-                ApplyFilter(new GroupFilter(GroupFilterMode.X_Filter,bar));
+                //applyFilter(new ViewSetFilter(viewSet));
 
                 //viewer.transform.position = camPosition;
                 //viewer.transform.LookAt(lookPosition);
 
-                setBarHighlighted(bar);
+                //setBarHighlighted(bar);
 
 
                 return true;
@@ -303,7 +359,8 @@ public class InteractionController : MonoBehaviour
 
     }
 
-    private void resetFilter()
+
+    private void setBarsDefault()
     {
         foreach(BarGroup group in generator.Graph.ListOfGroups)
         {
@@ -319,7 +376,12 @@ public class InteractionController : MonoBehaviour
         }
     }
 
-    private GameObject[] ApplyFilter(IFilter filter)
+    /// <summary>
+    /// Applies a filter <see cref="IFilter"/> on all bars
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    private GameObject[] applyFilter(IFilter filter)
     {
         List<GameObject> filtered = new List<GameObject>();
 
@@ -329,7 +391,7 @@ public class InteractionController : MonoBehaviour
             {
                 if (filter.query(bar))
                 {
-                    setBarHighlighted(bar);
+                    //setBarHighlighted(bar);
                     filtered.Add(bar);
                 }
                 else
@@ -346,9 +408,12 @@ public class InteractionController : MonoBehaviour
         return filtered.ToArray();
     }
 
-    private void Sort(GameObject bar)
+    private void sort(GameObject bar)
     {
         BarProperty property = bar.GetComponent<BarProperty>();
+        List<GameObject> bars = new List<GameObject>(barDatasets.Keys);
+        bars.Sort(new BarComparer());
+
 
         if(property != null)
         {
@@ -357,6 +422,9 @@ public class InteractionController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// register all handlers
+    /// </summary>
     private void setEventsFromGenerator()
     {
         generator.OnBarPointerDown.AddListener(onBarPointerDown);
@@ -365,8 +433,9 @@ public class InteractionController : MonoBehaviour
         generator.OnBarHoverExit.AddListener(onBarHoverExit);
     }
 
-    bool start = false;
-
+    /// <summary>
+    /// update the movement of the camera based on the user input
+    /// </summary>
     private void updateMovement()
     {
         const float rotSpeed = 30;
@@ -378,7 +447,10 @@ public class InteractionController : MonoBehaviour
         float move_X = Input.GetAxis("Horizontal");
         float move_Y = Input.GetAxis("Vertical");
 
-        if (!start) // ignore first input for avoiding bad start
+        if (moving)
+            return;
+
+            if (!start) // ignore first input for avoiding bad start
         {
             rot_X = 0;
             rot_Y = 0;
