@@ -75,8 +75,8 @@ public class InteractionController : MonoBehaviour
             return;
         }
 
-        viewer.transform.position = new Vector3(18.7088f, 29.20664f, -84.86042f);
-        viewer.transform.rotation = Quaternion.Euler(21.685f, 0.511f, 0);
+        //viewer.transform.position = new Vector3(18.7088f, 29.20664f, -84.86042f);
+        //viewer.transform.rotation = Quaternion.Euler(21.685f, 0.511f, 0);
         setEventsFromGenerator();
         registerAll();
     }
