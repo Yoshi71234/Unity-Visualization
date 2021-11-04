@@ -337,7 +337,7 @@ public class InteractionController : MonoBehaviour
                 }
 
 
-                Vector3 relCamVec = (bar.transform.up * bar.transform.localScale.y) - bar.transform.right * 7 + bar.transform.up * 7 - bar.transform.forward * 7;
+                //Vector3 relCamVec = (bar.transform.up * bar.transform.localScale.y) - bar.transform.right * 7 + bar.transform.up * 7 - bar.transform.forward * 7;
 
                 //grey_bars_without(bar);
 

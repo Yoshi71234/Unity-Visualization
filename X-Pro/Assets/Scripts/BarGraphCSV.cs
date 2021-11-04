@@ -180,7 +180,7 @@ public class BarGraphCSV : MonoBehaviour
             case 12: return "December"; break;
             default: return string.Empty;
         }
-    }
+    }   
 
     void SetBarGraphDataSet(List<Dictionary<string, object>> data)
     {
@@ -277,6 +277,5 @@ public class BarGraphCSV : MonoBehaviour
     //    }
     //}
 }
-
 
 
