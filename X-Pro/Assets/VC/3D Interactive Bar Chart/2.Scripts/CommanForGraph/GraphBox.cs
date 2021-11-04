@@ -92,7 +92,6 @@ namespace Graph.VittorCloud
             XYPlane.transform.localScale = new Vector3(XLength + xOffset, YLength + yOffset, XYPlane.transform.localScale.z);
             XZPlane.transform.localScale = new Vector3(XLength + xOffset, XZPlane.transform.localScale.y, ZLength + zOffset);
             YZPlane.transform.localScale = new Vector3(YZPlane.transform.localScale.x, YLength + yOffset, ZLength + zOffset);
-
             barParent.transform.rotation = transform.rotation;
 
 

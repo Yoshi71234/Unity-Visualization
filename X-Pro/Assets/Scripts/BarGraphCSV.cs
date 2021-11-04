@@ -44,6 +44,8 @@ public class BarGraphCSV : MonoBehaviour
 
         barGraphGenerator.GeneratBarGraph(visuDataSet);
 
+
+
         //string logString = "[";
 
         //foreach (string key in parsed[0].Keys)
