@@ -2,6 +2,8 @@ using BarGraph.VittorCloud;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using UnityEngine;
 
 [Serializable]
@@ -55,11 +57,26 @@ public class InteractionController : MonoBehaviour
     private bool Around(Vector3 point1, Vector3 point2, float distance)
     {
         return (point1 - point2).magnitude < distance;
+
+        
+    }
+
+    private void TestItOut()
+    {
+        int[] numbers = new int[11];
+        for (int i = 0; i <= 10; i++)
+            numbers[i] = i;
+
+        string lambda = "number => number % 2 == 0"; // get all odd numbers
+
+        
     }
 
     // Start is called before the first frame update
     void Start()
-    {       
+    {
+
+        TestItOut();
 
         if(viewer == null)
         {
